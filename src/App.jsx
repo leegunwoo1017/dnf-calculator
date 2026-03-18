@@ -219,16 +219,16 @@ function App() {
       {/* Tab Navigation */}
       <nav className="tab-nav">
         <button
-          className={`tab-btn ${activeTab === 'calculator' ? 'active' : ''}`}
-          onClick={() => setActiveTab('calculator')}
-        >
-          데미지 계산기
-        </button>
-        <button
           className={`tab-btn ${activeTab === 'search' ? 'active' : ''}`}
           onClick={() => setActiveTab('search')}
         >
           캐릭터/모험단 검색
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'calculator' ? 'active' : ''}`}
+          onClick={() => setActiveTab('calculator')}
+        >
+          데미지 계산기
         </button>
         <button
           className="tab-btn settings-btn"
