@@ -17,7 +17,7 @@ const SERVERS = [
 const ENV_API_KEY = import.meta.env.VITE_DNF_API_KEY || ''
 
 function App() {
-  const [activeTab, setActiveTab] = useState('calculator')
+  const [activeTab, setActiveTab] = useState('search')
   const [apiKey, setApiKey] = useState(ENV_API_KEY)
   const [showApiKeyInput, setShowApiKeyInput] = useState(false)
 
