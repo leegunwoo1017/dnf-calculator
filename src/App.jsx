@@ -112,8 +112,8 @@ function App() {
 
     try {
       const encodedName = encodeURIComponent(searchQuery)
-      const serverParam = selectedServer === 'all' ? '' : `&serverId=${selectedServer}`
-      const url = `https://api.neople.co.kr/df/servers/${selectedServer === 'all' ? 'all' : selectedServer}/characters?characterName=${encodedName}&limit=20&wordType=match&apikey=${apiKey}`
+      const serverParam = selectedServer === 'all' ? 'all' : selectedServer
+      const url = `/api/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=20&wordType=match&apikey=${apiKey}`
 
       const response = await fetch(url)
       const data = await response.json()
@@ -151,7 +151,7 @@ function App() {
     try {
       const encodedName = encodeURIComponent(searchQuery)
       const serverParam = selectedServer === 'all' ? 'all' : selectedServer
-      const url = `https://api.neople.co.kr/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=50&wordType=match&apikey=${apiKey}`
+      const url = `/api/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=50&wordType=match&apikey=${apiKey}`
 
       const response = await fetch(url)
       const data = await response.json()
