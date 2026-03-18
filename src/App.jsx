@@ -151,7 +151,7 @@ function App() {
     try {
       const encodedName = encodeURIComponent(searchQuery)
       const serverParam = selectedServer === 'all' ? 'all' : selectedServer
-      const url = `/api/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=50&wordType=match&apikey=${apiKey}`
+      const url = `/api/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=20&wordType=match&apikey=${apiKey}`
 
       const response = await fetch(url)
       const data = await response.json()
@@ -160,19 +160,39 @@ function App() {
         throw new Error(data.error.message || 'API 오류가 발생했습니다.')
       }
 
+      if (!data.rows || data.rows.length === 0) {
+        setSearchResults({ type: 'adventurer', data: [] })
+        return
+      }
+
+      // 각 캐릭터의 상세 정보를 가져와서 모험단명 확인
+      const characterDetails = await Promise.all(
+        data.rows.slice(0, 10).map(async (char) => {
+          try {
+            const detailUrl = `/api/df/servers/${char.serverId}/characters/${char.characterId}?apikey=${apiKey}`
+            const detailRes = await fetch(detailUrl)
+            const detailData = await detailRes.json()
+            return { ...char, ...detailData }
+          } catch {
+            return char
+          }
+        })
+      )
+
       // Group by adventure name
       const adventureMap = new Map()
-      ;(data.rows || []).forEach(char => {
+      characterDetails.forEach(char => {
         if (char.adventureName) {
-          if (!adventureMap.has(char.adventureName)) {
-            adventureMap.set(char.adventureName, {
+          const key = `${char.serverId}-${char.adventureName}`
+          if (!adventureMap.has(key)) {
+            adventureMap.set(key, {
               adventureName: char.adventureName,
               serverId: char.serverId,
               serverName: SERVERS.find(s => s.id === char.serverId)?.name || char.serverId,
               characters: []
             })
           }
-          adventureMap.get(char.adventureName).characters.push(char)
+          adventureMap.get(key).characters.push(char)
         }
       })
 
