@@ -153,8 +153,10 @@ function App() {
       const serverParam = selectedServer === 'all' ? 'all' : selectedServer
       const url = `/api/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=20&wordType=match&apikey=${apiKey}`
 
+      console.log('모험단 검색 URL:', url)
       const response = await fetch(url)
       const data = await response.json()
+      console.log('캐릭터 검색 결과:', data)
 
       if (data.error) {
         throw new Error(data.error.message || 'API 오류가 발생했습니다.')
@@ -166,14 +168,17 @@ function App() {
       }
 
       // 각 캐릭터의 상세 정보를 가져와서 모험단명 확인
+      console.log('상세 정보 조회 중...')
       const characterDetails = await Promise.all(
         data.rows.slice(0, 10).map(async (char) => {
           try {
             const detailUrl = `/api/df/servers/${char.serverId}/characters/${char.characterId}?apikey=${apiKey}`
             const detailRes = await fetch(detailUrl)
             const detailData = await detailRes.json()
+            console.log('캐릭터 상세:', char.characterName, detailData.adventureName)
             return { ...char, ...detailData }
-          } catch {
+          } catch (e) {
+            console.error('상세 조회 실패:', char.characterName, e)
             return char
           }
         })
@@ -196,11 +201,15 @@ function App() {
         }
       })
 
+      const results = Array.from(adventureMap.values())
+      console.log('모험단 그룹 결과:', results)
+
       setSearchResults({
         type: 'adventurer',
-        data: Array.from(adventureMap.values())
+        data: results
       })
     } catch (err) {
+      console.error('검색 에러:', err)
       setError(err.message || '검색 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
@@ -389,13 +398,17 @@ function App() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={searchType === 'character' ? '캐릭터명 입력' : '모험단명 또는 캐릭터명 입력'}
+                  placeholder="캐릭터명 입력"
                   className="search-input"
                 />
                 <button onClick={handleSearch} className="search-btn" disabled={loading}>
                   {loading ? '검색 중...' : '검색'}
                 </button>
               </div>
+
+              {searchType === 'adventurer' && (
+                <p className="search-hint">캐릭터명으로 검색하면 해당 캐릭터의 모험단 정보를 확인할 수 있습니다.</p>
+              )}
 
               {error && <div className="error-message">{error}</div>}
             </section>
