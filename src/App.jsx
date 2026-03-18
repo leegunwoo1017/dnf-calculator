@@ -13,9 +13,12 @@ const SERVERS = [
   { id: 'bakal', name: '바칼' },
 ]
 
+// 환경 변수에서 API 키 가져오기
+const ENV_API_KEY = import.meta.env.VITE_DNF_API_KEY || ''
+
 function App() {
   const [activeTab, setActiveTab] = useState('calculator')
-  const [apiKey, setApiKey] = useState('')
+  const [apiKey, setApiKey] = useState(ENV_API_KEY)
   const [showApiKeyInput, setShowApiKeyInput] = useState(false)
 
   // Calculator state
@@ -38,11 +41,15 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // Load API key from localStorage
+  // Load API key (환경변수 우선, 없으면 localStorage)
   useEffect(() => {
-    const savedApiKey = localStorage.getItem('dnf_api_key')
-    if (savedApiKey) {
-      setApiKey(savedApiKey)
+    if (ENV_API_KEY) {
+      setApiKey(ENV_API_KEY)
+    } else {
+      const savedApiKey = localStorage.getItem('dnf_api_key')
+      if (savedApiKey) {
+        setApiKey(savedApiKey)
+      }
     }
   }, [])
 
