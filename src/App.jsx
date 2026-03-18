@@ -153,10 +153,8 @@ function App() {
       const serverParam = selectedServer === 'all' ? 'all' : selectedServer
       const url = `/api/df/servers/${serverParam}/characters?characterName=${encodedName}&limit=20&wordType=match&apikey=${apiKey}`
 
-      console.log('모험단 검색 URL:', url)
       const response = await fetch(url)
       const data = await response.json()
-      console.log('캐릭터 검색 결과:', data)
 
       if (data.error) {
         throw new Error(data.error.message || 'API 오류가 발생했습니다.')
@@ -168,17 +166,14 @@ function App() {
       }
 
       // 각 캐릭터의 상세 정보를 가져와서 모험단명 확인
-      console.log('상세 정보 조회 중...')
       const characterDetails = await Promise.all(
         data.rows.slice(0, 10).map(async (char) => {
           try {
             const detailUrl = `/api/df/servers/${char.serverId}/characters/${char.characterId}?apikey=${apiKey}`
             const detailRes = await fetch(detailUrl)
             const detailData = await detailRes.json()
-            console.log('캐릭터 상세:', char.characterName, detailData.adventureName)
             return { ...char, ...detailData }
-          } catch (e) {
-            console.error('상세 조회 실패:', char.characterName, e)
+          } catch {
             return char
           }
         })
@@ -202,14 +197,12 @@ function App() {
       })
 
       const results = Array.from(adventureMap.values())
-      console.log('모험단 그룹 결과:', results)
 
       setSearchResults({
         type: 'adventurer',
         data: results
       })
     } catch (err) {
-      console.error('검색 에러:', err)
       setError(err.message || '검색 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
